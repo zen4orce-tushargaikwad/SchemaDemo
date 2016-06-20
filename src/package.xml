@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <types>
+        <members>CustomSchemaBuilder</members>
+        <members>CustomSchemaBuilderTest</members>
+        <members>FileUploader</members>
+        <members>FileUploaderTest</members>
+        <members>MetadataService</members>
+        <members>MetadataServiceTest</members>
+        <members>SchemaCreatorSelectorTestClass</members>
+        <members>SchemaCreatorService</members>
+        <members>SchemaCreatorServiceHandler</members>
+        <members>SchemaCreatorServiceHandlerTest</members>
+        <members>SchemaCreatorServiceTest</members>
+        <name>ApexClass</name>
+    </types>
+    <types>
+        <members>CreateSchema</members>
+        <members>bootstrapupload</members>
+        <name>ApexComponent</name>
+    </types>
+    <types>
+        <members>SBLandingPAge</members>
+        <name>ApexPage</name>
+    </types>
+    <types>
+        <members>*</members>
+        <name>CustomLabels</name>
+    </types>
+    <types>
+        <members>CSVData</members>
+        <members>SLDS103</members>
+        <name>StaticResource</name>
+    </types>
+    <version>15.0</version>
+</Package>

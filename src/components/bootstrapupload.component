@@ -1,0 +1,85 @@
+<apex:component controller="SchemaCreatorService">
+
+<apex:includescript value="//code.jquery.com/jquery-1.11.1.min.js" />
+	<apex:includescript value="//cdn.datatables.net/1.10.4/js/jquery.dataTables.min.js" />
+	<script
+		src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+	<apex:stylesheet value="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" />
+	<apex:stylesheet value="//cdn.datatables.net/1.10.4/css/jquery.dataTables.css" />
+	<apex:stylesheet value="{!URLFOR($Resource.bootstrap_sf1_beta16, 'bootstrap-sf1-0.1.0-beta.16/dist/css/bootstrap.css')}"/>
+
+	<script>
+    	 j$ = jQuery.noConflict();
+    	 j$(document).ready( function () {
+      getObjects();
+   });
+ 		function downloadAll(files){
+    		if(files.length == 0) return;
+    		file = files.pop();
+    		var theAnchor = j$('<a />')
+        	.attr('href', file[1])
+        	.attr('download',file[0])
+        	// Firefox does not fires click if the link is outside
+        	// the DOM
+        	.appendTo('body');
+    
+	    theAnchor[0].click(); 
+    	theAnchor.remove();
+	    downloadAll(files);
+	}
+	function downloadAllFiles(){
+        debugger;
+        downloadAll([
+        ['SampleTemplate.xls', 'data:text/xls;charset=utf8,'+
+                  encodeURIComponent('{!csvData}')],
+        ['Help.xls', 'data:text/xls;charset=utf8,'+
+                  encodeURIComponent('{!helpData}')],
+    ]);
+    }
+    
+    function getObjects() {
+       	var mylstar = {!lstlstCMTFields};   
+   		j$('#example').DataTable( {
+        	data:mylstar ,
+        	columns: [
+            { title: "Field Attribute" },
+            { title: "CSV API Name" },
+            { title: "Daya Type" },
+            { title: "Description" }
+	        ] 
+    	});
+	}
+    
+    </script>
+	
+	<div class="card context-file yellow" data-toggle="modal"
+		data-target="#load">
+		<div class="card-heading">Help</div>
+		<ul class="card-detail ">
+			<li>Get Help Here</li>
+			<li></li>
+			<!-- 							<li>Something more..</li> -->
+		</ul>
+	</div>
+
+	<!-- Modal -->
+	<div class="modal fade" id="load" role="dialog">
+		<div class="modal-dialog modal-lg">
+			<!-- Modal content-->
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal">&times;</button>
+					<h4 class="modal-title">Download Help Files</h4>
+				</div>
+				<div class="modal-body" style="overflow-y: auto; height: 500px;">  
+					<button type="button" class="btn-primary" style="height:10%"
+						data-toggle="modal" onclick="downloadAllFiles()">Download
+						Help Files</button>
+					<br /> <br />
+					<table id="example" class="display"></table>
+				</div>
+			</div>
+		</div>
+	</div>
+
+</apex:component>

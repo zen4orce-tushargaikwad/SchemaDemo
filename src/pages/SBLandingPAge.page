@@ -1,0 +1,91 @@
+<apex:page showHeader="false" sidebar="false" standardstylesheets="true">
+	<head>
+<apex:includescript value="//code.jquery.com/jquery-1.11.1.min.js"/ >
+	<apex:includescript value="//cdn.datatables.net/1.10.4/js/jquery.dataTables.min.js" />
+	<apex:stylesheet value="{!URLFOR($Resource.bootstrap_sf1_beta16, 'bootstrap-sf1-0.1.0-beta.16/dist/css/bootstrap.css')}" />
+	<apex:stylesheet value="//cdn.datatables.net/1.10.4/css/jquery.dataTables.css" />
+	<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css" />
+	<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" />
+	<style>
+.cardDashboard {
+	padding: 5% 0 0 0;
+}
+
+.card {
+	cursor: pointer;
+	border: none;
+	border-radius: 0px;
+}
+
+.row {
+	margin: 0;
+}
+
+/* .card:hover{ */
+/*  opacity:0.5; */
+/* } */
+.green {
+	background-color: #00ccff !important;
+}
+
+.yellow {
+	background-color: #EBB741 !important;
+}
+
+.cyan {
+	background-color: #04ACAD !important;
+}
+
+.orange {
+	background-color: #F2854C !important;
+}
+
+.green:hover {
+	
+}
+</style>
+	</head>
+	<apex:pageMessages />
+	<body>
+		<div class="cardDashboard">
+			<div class="row">
+				<div class="col-md-3"></div>
+				<div class="col-md-6">
+					<c:CreateSchema />
+				</div>
+				<div class="col-md-3"></div>
+			</div>
+			<div class="row">
+				<div class="col-md-3"></div>
+				<div class="col-md-6">
+					<c:bootstrapupload />
+<!-- 					<c:ModalTest /> -->
+				</div>
+				<div class="col-md-3"></div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-3"></div>
+			<div class="col-md-3">
+					<div class="card context-event orange">
+					<div class="card-heading">DB Migration Coming Soon...</div>
+					<ul class="card-detail ">
+						<li>Some Description</li>
+						<li>Something more..</li>
+					</ul>
+				</div>
+<!-- 					<c:HelpFiels /> -->
+			</div>
+			<div class="col-md-3">
+				<div class="card context-feed cyan">
+					<div class="card-heading">UI.. Coming Soon..</div>
+					<ul class="card-detail ">
+						<li>Some Description</li>
+						<li>Something more..</li>
+					</ul>
+				</div>
+			</div>
+			<div class="col-md-3"></div>
+		</div>
+	</body>
+</apex:page>

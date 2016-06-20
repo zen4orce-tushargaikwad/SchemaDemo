@@ -1,0 +1,131 @@
+<apex:component controller="SchemaCreatorService">
+	
+
+	<style>
+	
+	.button {
+    background-color: #007bbd;
+    border-radius: 5px;
+    color: white;
+    padding: 10px 25px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    cursor: pointer;
+}
+.myClass{
+color:white	 !important;
+padding: 20px 30px;
+font-size: 16px;
+background:#007bbd !important;
+}
+html {
+	margin: 10px;
+}
+
+.fileType {
+	display: block;
+	position: relative;
+	width: 193px;
+	cursor: pointer;
+	border: 0;
+	height: 30px;
+	border-radius: 5px;
+	outline: 0;
+}
+
+.fileType:hover:after {
+	background: #FF1111;
+}
+
+.fileType:after {
+	transition: 200ms all ease;
+	background: #000000;
+	background-color: hsl(201, 100%, 30%) !important;
+	background-repeat: repeat-x;
+	filter: progid : DXImageTransform.Microsoft.gradient ( startColorstr =
+		"#00a5ff", endColorstr = "#006399" );
+	background-image: -khtml-gradient(linear, left top, left bottom, from(#00a5ff),
+		to(#006399) );
+	background-image: -moz-linear-gradient(top, #00a5ff, #006399);
+	background-image: -ms-linear-gradient(top, #00a5ff, #006399);
+	background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #00a5ff),
+		color-stop(100%, #006399) );
+	background-image: -webkit-linear-gradient(top, #00a5ff, #006399);
+	background-image: -o-linear-gradient(top, #00a5ff, #006399);
+	background-image: linear-gradient(#00a5ff, #006399);
+	border-color: #006399 #006399 hsl(201, 100%, 25%);
+	color: #fff !important;
+	text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.33);
+	font-size: 16px;
+	text-align: center;
+	position: absolute;
+	top: 0;
+	right: 100px;
+	width: 50%;
+	height: 100%;
+	display: block;
+	content: 'Browse';
+	line-height: 30px;
+	border-radius: 5px;
+}
+</style>
+	<apex:includescript value="//code.jquery.com/jquery-1.11.1.min.js" />
+	<apex:includescript value="//cdn.datatables.net/1.10.4/js/jquery.dataTables.min.js" />
+	<apex:stylesheet value="{!URLFOR($Resource.bootstrap_sf1_beta16, 'bootstrap-sf1-0.1.0-beta.16/dist/css/bootstrap.css')}" />
+	<apex:stylesheet value="//cdn.datatables.net/1.10.4/css/jquery.dataTables.css" />
+	<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" />
+	
+	<div class="card context-link green" data-toggle="modal"
+		data-target="#uploadModal">
+		<div class="card-heading">File Upload</div>
+		<ul class="card-detail ">
+			<li>Only csv files are allowed.</li>
+			<li>Use Help files for better result.</li>
+		</ul>
+	</div>
+	<div class="container">
+		<div class="center">
+		<div class="modal fade" id="uploadModal" role="dialog">
+			<div class="modal-dialog modal-sm">
+				<!-- Modal content-->
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal">&times;</button>
+						<h4 class="modal-title">Download Help Files</h4>
+					</div>
+					<div class="modal-body">
+						<apex:form >
+							<!-- 						<apex:inputHidden value="{!contentFile}" id="inptHdn" /> -->
+							<!-- 						<apex:inputHidden value="{!nameFile}" id="inptHdnname" /> -->
+
+							<font color="red">*Select Object </font>
+							<apex:selectList id="obj" size="1" value="{!selectedObj}"
+								label="Select Object">
+								<apex:selectOptions value="{!objList}" />
+							</apex:selectList>
+							<br />
+							<br />
+							<font color="red">*Please Choose the file for upload</font>
+							<apex:actionRegion >
+								<apex:inputFile value="{!contentFile}" filename="{!nameFile}"
+									accept=".csv" styleclass="fileType" />
+							</apex:actionRegion>
+
+							<br />
+							<!-- 						<div styleclass="myClass"> -->
+							<!-- 						<apex:commandButton action="{!ReadFile}" value="Upload File" -->
+							<!-- 								id="uploadButton" style="background:#007bbd;width:100px; hieght:60;color:white;border-radius:5px" styleClass="buttonStyle"/> -->
+							<apex:commandButton action="{!ReadFile}" value="Upload File"
+								style="background:#007bbd;width:37%;height:100%;color:white;border-radius:5px"
+								styleClass="btn-primary" />
+							<!-- 						</div> -->
+						</apex:form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	</div>
+</apex:component>
