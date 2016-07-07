@@ -10,6 +10,14 @@ public with sharing class SchemaCreatorServiceHandler {
 	Map<String, String> innerMap1;
 	public static Boolean summaryPage;
 	
+	public boolean objectVerification(String objName)
+	{
+		if(objName.equalsIgnoreCase('select'))
+		return false;
+		return true;
+	}
+	
+	//
 	public List<Selectoption> getAllObjects(){
         map<String,schema.SObjectType> globalDescribe=schema.getGlobalDescribe();
         List<String> objList=new List<String>();
@@ -24,11 +32,37 @@ public with sharing class SchemaCreatorServiceHandler {
         return objects;
     }
     
+    public List<string> getAllProfiles() 
+    {
+    	return CustomSchemaBuilder.getallProfiles();
+    }
+    
+     public List<List<String>> getAllProfilesdata() 
+    {
+    	 List<string> profiledata = new List<string>();
+    	 profiledata = CustomSchemaBuilder.getallProfiles();
+    	 List<String> allProfile; 
+    	 List<List<String>> lstlstProfiles = new List<List<string>>();
+    	
+
+    	for(string f : profiledata)
+    	{
+    		system.debug('data chaekc   '+f);
+        		allProfile=new List<String>();
+		    	allProfile.add('"'+f+'"'); 
+		    	allProfile.add('"<input type=' + '\''  +'checkbox'+'\''+'name=' + '\'' + 'actionSelectorEdit' + '\'' +'/>'+'"' );   
+		    	allProfile.add('"<input type=' + '\''  +'checkbox'+'\''+'name=' + '\'' + 'actionSelectorRead' + '\'' +'/>'+'"' );   
+		    	//  "  'name="actionSelectorAll" />'
+    			lstlstProfiles.add(allProfile); 
+    	}
+    	return lstlstProfiles;
+    }
+    
 	//returns list<list<String>> for help table    
     public  List<List<String>> cont(){
 	    List<FieldTypeDetails__mdt> lstCMTFields=new List<FieldTypeDetails__mdt>();
-	    List<String> lstCMT;
 	    lstCMTFields=SelectorClass.selectCMTFields();
+	    List<String> lstCMT;
 	    List<List<String>> lstlstCMTFields = new List<List<string>>();
 	    for(FieldTypeDetails__mdt f : lstCMTFields)
     	{
@@ -126,7 +160,7 @@ public with sharing class SchemaCreatorServiceHandler {
         } 
         csvFileString = csvFileString.trim();
 		Blob csvBlob = Blob.valueOf(csvFileString);
-        System.debug('String'+csvFileString);
+        //System.debug('String'+csvFileString);
         return csvFileString;
 	}
 	public String generateHelp()
@@ -134,7 +168,7 @@ public with sharing class SchemaCreatorServiceHandler {
     	List<FieldTypeDetails__mdt> lstCSVNameMetadata =new List<FieldTypeDetails__mdt>();
     	lstCSVNameMetadata=SelectorClass.selectHelpData();
         String csvFileString=''; 
-        system.debug('Help');
+        //system.debug('Help');
         csvFileString +=  'CSVColumnName'+'\\t';
         csvFileString +=  'DataType'+'\\t';
         csvFileString +=  'Description'+'\\n';
@@ -148,8 +182,10 @@ public with sharing class SchemaCreatorServiceHandler {
         return csvFileString;
     }
     public Boolean checkBlankCSV(Blob contentFile){
-    	nameFile=contentFile.toString();
-        filelines = nameFile.split('\n');
+    	string nameFile2=contentFile.toString();
+    	//system.debug('namefile2 '+nameFile2);
+        filelines = nameFile2.split('\n');
+       // system.debug('File Line Size'+filelines.size());
         if(filelines.size()<2){
             return false;
         }
@@ -175,13 +211,13 @@ public with sharing class SchemaCreatorServiceHandler {
                 break;
             }
         }
-        system.debug('File Columns Size'+filecolumns.size());
-        system.debug('File Lines Size'+filelines.size());
+        //system.debug('File Columns Size'+filecolumns.size());
+        //system.debug('File Lines Size'+filelines.size());
         for (Integer i=1;i<filelines.size();i++){
                 String[] inputvalues = new String[]{};
                 inputvalues = filelines[i].split(',');      
-            system.debug('input values'+inputvalues);
-            system.debug('input values'+inputvalues.size());
+            //system.debug('input values'+inputvalues);
+            //system.debug('input values'+inputvalues.size());
                 lstString = new set<string>();
                 innerMap = new Map<string,string>();
                 for(Integer j=0;j<filecolumns.size();j++){
@@ -215,14 +251,17 @@ public with sharing class SchemaCreatorServiceHandler {
     	List<string> lstMandatoryColumnNotexist = new List<string>();
     	setFieldType = new Set<String>();
     	innerMap1 = new map<string,string>();
+    	map<string,string> innerMapa = new map<string,string>();
     	string mandFields='' ;
     	 for(String fieldApi : mapCSV.keySet()){   
-        	  innerMap1 = mapCSV.get(fieldApi);
+        	 // innerMap1=mapCSV.get(fieldApi);    
         	for(String innermapkey : mapCSV.get(fieldApi).keySet()){
+        		 innerMapa.put(innermapkey,mapCSV.get(fieldApi).get(innermapkey));
         		if(innermapkey==mapAPIName.get('type_x')){
         			 setFieldType.add(mapCSV.get(fieldApi).get(innermapkey));
         		} 
         	}
+        	innerMap1=innerMapa;
     	 }
     	 for (string fype:setFieldType ){
     	 	lstMandatoryColumnNotexist = new List<string>();
@@ -236,22 +275,78 @@ public with sharing class SchemaCreatorServiceHandler {
     	 		}
     	 }
         if(lstMandatoryColumnNotexist.size()>0){
-			errormsg = new ApexPages.Message(ApexPages.severity.ERROR,System.Label.MandatoryColumnNotExist+lstMandatoryColumnNotexist);
-           	ApexPages.addMessage(errormsg);
+			//errormsg = new ApexPages.Message(ApexPages.severity.ERROR,System.Label.MandatoryColumnNotExist+lstMandatoryColumnNotexist);
+           	//ApexPages.addMessage(errormsg);
 			return false;            
         }
        	return true;    
     }
     //Data validation for CSV ** WIP 
+    
+    
+    public Boolean dValidation(map<string,string> mapFieldDataType,map<string,map<string,string>> mapCSV,map<string,string> mapAPIName,map<string,string> mapMandatoryFields)
+    {
+    	 ApexPages.Message errormsg ;
+    	String columnValue='';
+     	String mandFields='';
+    	     for(String fieldApi : mapCSV.keySet()){   																			//System.debug('outer map value'+fieldApi);
+        	Map<String, String> innerMap1 = mapCSV.get(fieldApi);
+        	for(String innermapkey : mapCSV.get(fieldApi).keySet()){
+        		if(innermapkey=='FieldType'){
+        			columnValue  = mapCSV.get(fieldApi).get(innermapkey);
+        				if(columnValue!=''){
+        					mandFields = mapMandatoryFields.get(columnValue);
+                 			if(mandFields!=null){
+                 				for (String columns : mandFields.split(',')) {
+    								if (lstString.contains(mapAPIName.get(columns))) {
+    									String datatype = mapFieldDataType.get(mapAPIName.get(columns));
+    									String value = innerMap1.get(mapAPIName.get(columns));
+    									if(datatype=='Number'){
+    										try{
+    											Integer iValue = Integer.valueOf(value);
+    											} catch(Exception e){
+    												errormsg = new ApexPages.Message(ApexPages.severity.ERROR,System.Label.DataValidation+mapAPIName.get(columns)+' Data: '+value ); 
+            										ApexPages.addMessage(errormsg);
+            										return false; 
+    											}
+    									}
+    									if(datatype=='Boolean'){
+    										if(value.equalsIgnoreCase('true')||value.equalsIgnoreCase('false')||value.equalsIgnoreCase(''))
+    										Boolean bValue = Boolean.valueOf(value) ;
+    										else{
+    											errormsg = new ApexPages.Message(ApexPages.severity.ERROR,System.Label.DataValidation+mapAPIName.get(columns)+' Data: '+value );
+            									ApexPages.addMessage(errormsg);
+            									return false; 
+    										}
+    									}
+    								}
+								} 
+                 			}
+        			}	
+        	}																	
+        	 }
+        }
+        return true;
+    }
+    
+    
+    
     public Boolean dataValidation(map<string,string> mapFieldDataType,map<string,map<string,string>> mapCSV,map<string,string> mapAPIName,map<string,string> mapMandatoryFields){
     	 ApexPages.Message errormsg ;
     	List<string> lstMandatoryColumnNotexist = new List<string>();
-    	string mandFields ;
+    	//string mandFields ;
+    //	for(String fieldApi : mapCSV.keySet()){   
+    //    	  innerMap2 = mapCSV.get(fieldApi) ;   
     	 for (string fype:setFieldType ){
-    	 	mandFields = mapMandatoryFields.get(fype);
+    	 	string mandFields = mapMandatoryFields.get(fype);
     	 		for(String mFiled :mandFields.split(',')){
     	 			if(lstString.contains(mapAPIName.get(mFiled))){
+    			    //	System.debug('field  '+mFiled);
+    			    //	System.debug('mapAPIName.get(mFiled)  '+mapAPIName.get(mFiled));
+    			    //	System.debug('fype  '+fype);
+    			    //	System.debug(' value '+innerMap1.get(mapAPIName.get(mFiled)));
     			    	String value = innerMap1.get(mapAPIName.get(mFiled));
+    			    	
     					if(mapFieldDataType.get(mapAPIName.get(mFiled))=='Number'){
     						try{
                     			value = value.trim();
@@ -266,9 +361,15 @@ public with sharing class SchemaCreatorServiceHandler {
             					return false;
     							}
     					}
-    						if(mapFieldDataType.get(mapAPIName.get(mFiled))=='Boolean'){
+    					//system.debug('mFiled Val'+mFiled);
+    						if(mapFieldDataType.get(mapAPIName.get(mFiled)).equalsIgnoreCase('Boolean')){
+    						//	System.debug('original V'+value);
     							if(value.equalsIgnoreCase('true')||value.equalsIgnoreCase('false')||value.equalsIgnoreCase(''))
+    							{
     								Boolean bValue = Boolean.valueOf(value) ;
+    							//	System.debug('Boolean value for TEXT'+bValue);
+    							//	System.debug(value);
+    							}
     							else{
     								errormsg = new ApexPages.Message(ApexPages.severity.ERROR,System.Label.DataValidation+' '+mFiled +'Data '+value );
             						ApexPages.addMessage(errormsg);
@@ -278,19 +379,20 @@ public with sharing class SchemaCreatorServiceHandler {
     	 			}
     	 		}
     	 }
+   // }
     	 return true;
     }
-    public Pagereference readFile(Blob contentFile,string nameFile,String selectedObj)
-    {
+    public string readFile(Blob contentFile,string nameFile,String selectedObj,String baseValue){
       	summaryPage=true; 
         String objName = selectedObj;
-    	 ApexPages.Message errormsg ;
+    	ApexPages.Message errormsg ;
         /* check If CSV is Blank then no need go further return from here */ 
-        	if(!checkBlankCSV(contentFile)){
+        	if(checkBlankCSV(contentFile)==false){
         		errormsg = new ApexPages.Message(ApexPages.severity.ERROR,System.Label.Blank_CSV);
             	ApexPages.addMessage(errormsg);
-        		return null;
+        		return System.Label.Blank_CSV;
         	}
+        	//system.debug('aftet blank csv');
  		/* SET contains all Predeifuned columns in metadata */ 
         	Set<string> defineCSVColumnNames = new set<string>();
         	set<FieldTypeDetails__mdt> lstAllCSVColumnNames=new set<FieldTypeDetails__mdt>();
@@ -313,19 +415,83 @@ public with sharing class SchemaCreatorServiceHandler {
         	if(matchedColumnsCSVandCMT(defineCSVColumnNames)==false){
         		errormsg = new ApexPages.Message(ApexPages.severity.ERROR,System.Label.ColumnNameNotValid+lstUnMatchedColumns);
             	ApexPages.addMessage(errormsg);
-        		return null;
+        		return System.Label.ColumnNameNotValid;
        		 }
         /* Check for mandatory Columns */
         if(mandatoryColumnCheck(defineCSVColumnNames,mapCSV,mapAPIName,mapMandatoryFields)==false)
         {
-            return null;
+        	
+            return 'Mandatory Columns Not Exist Please check';
+        }
+        //Data Validation
+     //   if(!dataValidation(mapFieldDataType,mapCSV,mapAPIName,mapMandatoryFields))
+     //   {
+     //   	return null;
+     //   }
+        
+         //Data Validation
+        if(dValidation(mapFieldDataType,mapCSV,mapAPIName,mapMandatoryFields)==false)
+        {
+        	return 'data is not valid for given columns';
+        }
+        String status; 
+        CustomSchemaBuilder csb = new CustomSchemaBuilder();
+  		status=csb.CSVData(mapCSV,objName);
+        return status;    
+	}
+	
+	//for testing
+	public string errorTest(Blob contentFile,string nameFile,String selectedObj){
+      	summaryPage=true;
+      	String errMsg=''; 
+        String objName = selectedObj;
+    	ApexPages.Message errormsg ;
+        /* check If CSV is Blank then no need go further return from here */ 
+        	if(!checkBlankCSV(contentFile)){
+        		errMsg = System.Label.Blank_CSV;
+        		return errMsg;
+        	}
+ 		/* SET contains all Predeifuned columns in metadata */ 
+        	Set<string> defineCSVColumnNames = new set<string>();
+        	set<FieldTypeDetails__mdt> lstAllCSVColumnNames=new set<FieldTypeDetails__mdt>();
+        	lstAllCSVColumnNames=SelectorClass.selectAllCSVColumnNames();
+        	for(FieldTypeDetails__mdt ft : lstAllCSVColumnNames){	
+        		defineCSVColumnNames.add(String.valueOf(ft.CSVColumnName__c));
+        	}
+        /* Map for Mandatory fields for field type */
+        	Map<string,string> mapMandatoryFields = new Map<string,string>();
+        	mapMandatoryFields=SelectorClass.selectMandatoryFields();
+        /* Map for column name and their data type */
+ 			Map<string,string> mapFieldDataType = new Map<string,string>();
+ 			mapFieldDataType=SelectorClass.selectColumnAndDataType();
+       /* */
+         	map<String,String> mapAPIName=new map<String,String>();
+         	mapAPIName=SelectorClass.selectColumnAndAPIName();
+        /* Get CSV data into map in map<FieldAPIName,map<columnName,rowValue>> format */ 
+        	Map<string,map<string,string>> mapCSV = csvToMap(contentFile);
+        /* Match CSV and custom metadata column names  */
+        	if(matchedColumnsCSVandCMT(defineCSVColumnNames)==false){
+        		
+        		errMsg = System.Label.ColumnNameNotValid; 
+        		return errMsg;
+        	//	errormsg = new ApexPages.Message(ApexPages.severity.ERROR,System.Label.ColumnNameNotValid+lstUnMatchedColumns);
+           // 	ApexPages.addMessage(errormsg);
+        	//		return null; 
+       		 }
+        /* Check for mandatory Columns */
+        if(mandatoryColumnCheck(defineCSVColumnNames,mapCSV,mapAPIName,mapMandatoryFields)==false)
+        {
+            errMsg = System.Label.MandatoryColumnNotExist;
+        	return errMsg;
         }
         //Data Validation
         if(!dataValidation(mapFieldDataType,mapCSV,mapAPIName,mapMandatoryFields))
         {
-        	return null;
+        	errMsg = 'Data Format is not proper';
+        	return errMsg;
         }
-  		CustomSchemaBuilder.CSVData(mapCSV,objName);
-        return null;    
+        CustomSchemaBuilder cs = new CustomSchemaBuilder();
+  		cs.CSVData(mapCSV,objName);
+        return 'sucess';    
 	}
 }
