@@ -1,0 +1,181 @@
+<apex:page controller="dynamicController">
+	<apex:includescript value="//code.jquery.com/jquery-1.11.1.min.js" />
+	<apex:includescript value="//cdn.datatables.net/1.10.4/js/jquery.dataTables.min.js" />
+	<script
+		src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+	<apex:stylesheet value="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" />
+	<apex:stylesheet value="//cdn.datatables.net/1.10.4/css/jquery.dataTables.css" />
+	<apex:stylesheet value="{!URLFOR($Resource.bootstrap_sf1_beta16, 'bootstrap-sf1-0.1.0-beta.16/dist/css/bootstrap.css')}" />
+	<script>
+ j$ = jQuery.noConflict();
+ var selectArr = [];
+ 
+function getProfiles() {
+        var mylstar = {!lstlstAllProfiles};   
+        //alert(mylstar); 
+    var table =  j$('#example').DataTable( {
+         data:mylstar ,
+         columns: [
+            { title: "Profile Name"},
+            { title: 'Edit  <input type="checkbox" name="actionSelectorEdit" />' },
+            { title: 'Read  <input type="checkbox" name="actionSelectorRead" />' }
+         ] 
+     });
+    
+    
+     
+   j$('#example tr').click(function(e) {
+       var test = j$(this).find('td').map(function() {
+           return j$(this).text();
+       }).get().join(" ");
+
+	   var idx = j$.inArray(test, selectArr);
+		if (idx == -1) {
+		
+		selectArr.push(test);
+		
+		} else {
+  		selectArr.splice(idx, 1);
+		}  
+		
+   		});
+   		
+   
+   j$('thead input[name="actionSelectorRead"]', table.table().container()).on('click', function(e){
+      if(this.checked){
+         j$('#example tbody input[name="actionSelectorRead"]:not(:checked)').trigger('click');
+      } else {
+         j$('#example tbody input[name="actionSelectorRead"]:checked').trigger('click');
+      }
+      // Prevent click event from propagating to parent
+      e.stopPropagation();  
+   });  
+ }
+ 
+ function getoptions() {
+     alert(selectArr);
+       j$('load').dialog('close');
+		CallApexMethod(selectArr.toString());
+ }
+ 
+</script>
+	<apex:form >
+	
+	<apex:outputPanel id="resultPanel">
+									
+	</apex:outputPanel>							
+	
+	<form id="abc">
+		<div class="modal fade" id="load" role="dialog">
+			<div class="modal-dialog modal-lg">
+				<!-- Modal content-->
+				<div class="modal-content">
+					<div class="modal-header">
+						<h4 class="modal-title">Profiles</h4>
+					</div>
+					<div class="modal-body">
+						<table id="example" class="display"></table>
+						<br /> <input type="button" value="Submit"
+							onclick="getoptions();" /> <br />
+					</div>
+				</div>
+			</div>
+		</div>
+		</form>
+
+
+		<div class="modal fade" id="option" role="dialog">
+			<div class="modal-dialog modal-lg">
+				<!-- Modal content-->
+				<div class="modal-content">
+					<div class="modal-header">
+						<h4 class="modal-title">Profiles</h4>
+					</div>
+					<div class="modal-body" style="overflow-y: auto; height: 500px;">
+						<!-- 						<font color="red">Selected Objects</font> -->
+						<table id="dataTableer" align="left">
+							<tr>
+								<td>Length</td>
+								<td><input type="text" value="" id="length" />
+								</td>
+							</tr>
+							<tr>
+								<td>Description</td>
+								<td><textarea value="" id="description"></textarea></td>
+							</tr>
+							<tr>
+								<td>Required</td>
+								<td><input type="checkbox" value="" id="required"></input>
+								</td>
+							</tr>
+
+
+						</table>
+						<!-- 						<table id="example" ></table> -->
+						<br /> <br />
+					</div>
+				</div>
+			</div>
+		</div>
+
+
+		<apex:pageblock >
+			<br></br>
+			<br></br>
+			<apex:commandButton value=" Add Row " action="{!AddRecord}"
+				reRender="pb1" />
+			<apex:commandButton value=" Submit " action="{!SaveData}" />
+			<input id="" type="button" value="SetFieldLevelSecuriety" onclick="getProfiles();"
+						data-toggle="modal" data-target="#load" />
+			<br></br>
+			<br></br>
+			<table>
+			<apex:pageBlockTable id="pb1" value="{!lstWrapper}" var="item">
+				<tr>
+				<td>
+				<apex:column headerValue="Index">
+					<apex:outputText value="{!item.index}"/>
+				</apex:column>
+				</td>
+				<td>
+				<apex:column headerValue="Label">
+					<apex:inputText value="{!item.FLabel}" />
+				</apex:column>
+				</td>
+				<td>
+				<apex:column headerValue="Name">
+					<apex:inputText value="{!item.FName}" />
+				</apex:column>
+				</td>
+				<td>
+				<apex:column headerValue="Type">
+					<apex:inputText value="{!item.FType}" />
+				</apex:column>
+				</td>
+<!-- 				<td> -->
+<!-- 				<apex:column headerValue="Options"> -->
+<!-- 					<input id="" type="button" value="Edit" onclick="getoptions();" -->
+<!-- 						data-toggle="modal" data-target="#option" /> -->
+<!-- 				</apex:column> -->
+<!-- 				</td> -->      
+<!-- 				<td> -->  
+<!-- 				<apex:column headerValue="Profiles"> -->
+<!-- 					<input id="" type="button" value="Edit" onclick="getProfiles();" -->
+<!-- 						data-toggle="modal" data-target="#load" /> -->
+<!-- 				</apex:column> --> 
+<!-- 				</td> -->
+				</tr>
+			</apex:pageBlockTable>
+			
+			</table>
+		</apex:pageblock>
+		
+
+<apex:actionFunction name="CallApexMethod" action="{!cSchema}"
+									reRender="resultPanel">
+									<apex:param name="firstParam" value="" assignTo="{!profiles}" />
+								</apex:actionFunction>
+
+
+	</apex:form>
+</apex:page>
