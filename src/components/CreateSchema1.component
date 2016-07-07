@@ -1,0 +1,95 @@
+<apex:component controller="SchemaCreatorService" allowDml="true">
+	<style>
+html {
+	margin: 10px;
+}
+</style>
+	<script>
+     j$ = jQuery.noConflict();
+    	 j$(document).ready( function () {
+      j$("#filename").change(function(e) {
+	var ext = j$("input#filename").val().split(".").pop().toLowerCase();
+	if(j$.inArray(ext, ["csv"]) == -1) {
+	alert('Upload CSV');
+	return false;
+	}
+	if (e.target.files != undefined) {
+	var reader = new FileReader();
+	reader.onload = function(e) {
+	var fullcsv=e.target.result;
+	var csvval=e.target.result.split("\n");
+     var b='txt';
+    CallApexMethod(fullcsv,b);
+	var csvvalue=csvval[1].split(",");
+	var inputrad="";
+	//j$("#csvimporthint").html(inputrad);
+	//j$("#csvimporthinttitle").show();
+	};
+    	reader.readAsText(e.target.files.item(0));
+	 }
+	return false;
+});
+   });
+    </script>
+	<apex:includescript value="//code.jquery.com/jquery-1.11.1.min.js" />
+	<!-- 	<apex:includescript -->
+	<!-- 		value="//cdn.datatables.net/1.10.4/js/jquery.dataTables.min.js" /> -->
+	<apex:stylesheet value="{!URLFOR($Resource.bootstrap_sf1_beta16, 'bootstrap-sf1-0.1.0-beta.16/dist/css/bootstrap.css')}" />
+	<!-- 	<apex:stylesheet -->
+	<!-- 		value="//cdn.datatables.net/1.10.4/css/jquery.dataTables.css" /> -->
+	<link rel="stylesheet"
+		href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" />
+	<div class="card context-link green" data-toggle="modal"
+		data-target="#uploadModal">
+		<div class="card-heading">File Upload trail</div>
+		<ul class="card-detail ">
+			<li>Only csv files are allowed.</li>
+			<li>Use Help files for better result.</li>
+		</ul>
+	</div>
+	<div class="container">
+		<div class="center">
+			<div class="modal fade" id="uploadModal" role="dialog">
+				<div class="modal-dialog modal-sm">
+					<!-- Modal content-->
+					<div class="modal-content" style="margin-top: 189px;">
+						<div class="modal-header">
+							<h4 class="modal-title">Upload File</h4>
+						</div>
+						<div class="modal-body">
+							<apex:form >
+								<apex:outputPanel id="resultPanel">
+									<apex:actionStatus startText="requesting..." stopText=""
+										id="myStatus" />
+									<br />
+									<b> <font color="Red"> 
+<!-- 									<apex:outputLabel value="{!errReason}" />   -->
+									<apex:outputLink value="../servlet/servlet.FileDownload?file=01528000001H95y" target="_blank">{!errReason}  Click Here for Log</apex:outputLink>
+									</font> </b>
+								</apex:outputPanel>
+								<br />
+								<!-- 								<div id="editor" style="display: None"></div> -->
+								<font color="red">*Select Object </font>
+								<apex:selectList id="obj" size="1" value="{!selectedObj}"
+									label="Select Object">
+									<apex:selectOptions value="{!objList}" />
+								</apex:selectList>
+								<br />
+								<br />
+								<font color="red">*Please Choose the file for upload</font>
+								<input type="file" name="filename" id="filename" />
+								<!-- 								<div id="csvimporthint" style="display: None"></div> -->
+
+								<apex:actionFunction name="CallApexMethod" action="{!echoVal}"
+									reRender="resultPanel" status="myStatus">
+									<apex:param name="firstParam" value="" />
+									<apex:param name="secondParam" value="" />
+								</apex:actionFunction>
+							</apex:form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</apex:component>
